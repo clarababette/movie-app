@@ -61,12 +61,12 @@ function Services(db) {
           });
           res.json({username, accessToken});
         } else {
-          res.send('invalid password')
+          res.status(401).send('invalid password')
         }
       })
 
     }).catch(err => {
-      res.send('user not found');
+      res.status(401).send('user not found');
     })
   };
 
@@ -78,10 +78,47 @@ function Services(db) {
   })
 }
 
+  const verifyJWT = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  if (!authHeader) return res.sendStatus(401);
+  const token = authHeader.split(' ')[1];
+  jwt.verify(
+    token,
+    process.env.ACCESS_TOKEN_SECRET,
+    (err, decoded) => {
+      if (err) return res.sendStatus(403);
+      req.user = decoded.username;
+      next();
+    }
+  )
+}
+
+const handleRefreshToken = (req, res) => {
+  const cookies = req.cookies
+  console.log(req)
+  if (!cookies?.jwt) return res.sendStatus(401);
+  const refreshToken = cookies.jwt;
+  jwt.verify(
+    refreshToken,
+    process.env.REFRESH_TOKEN_SECRET,
+    (err, decoded) => {
+      if (err) return res.sendStatus(403);
+      const username = decoded.username;
+      const accessToken = jwt.sign(
+            {username},
+            process.env.ACCESS_TOKEN_SECRET,
+            {expiresIn: '30s'},
+            );
+      res.json({ username, accessToken })
+    }
+  )
+}
+  
+  
   const search = async (req, res) => {
     const { queryString } = req.body;
     const key = process.env.MOVIE_API_KEY;
-    axios.get(`https://api.themoviedb.org/3/search/movie?api_key=${key}&query=${queryString}&include_adult=false`).then(result => {
+    await axios.get(`https://api.themoviedb.org/3/search/movie?api_key=${key}&query=${queryString}&include_adult=false`).then(result => {
       let movies = result.data.results.map(movie => { return { popularity: movie.popularity, poster: movie.poster_path, title: movie.title } })
       movies = sortByPropFloat(movies, 'popularity');
       res.json(movies)
@@ -89,7 +126,6 @@ function Services(db) {
   };
   const getPlaylist = async (req, res) => {
     const { username } = req.params;
-    console.log(username)
     await db.many('select movies.* from movies join users on movies.user_id=users.id where users.username = $1', [username]).then(result => {
       res.json(result);
     }).catch(err => res.send(err))
@@ -112,6 +148,7 @@ function Services(db) {
     getPlaylist,
     addToPlaylist,
     removeFromPlaylist,
+    handleRefreshToken
   };
 }
 

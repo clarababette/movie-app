@@ -3,7 +3,8 @@ const cors = require('cors');
 const PgPromise = require('pg-promise');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
-const Services = require('./services')
+const Services = require('./services');
+const cookieParser = require('cookie-parser')
 
 const app = express();
 
@@ -22,9 +23,11 @@ const api = Services(db);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cors());
+app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
+app.use(cookieParser())
 
 app.post('/api/signup', api.signup);
+app.post('/api/refresh', api.handleRefreshToken);
 app.post('/api/login', api.login);
 app.get('/api/search', api.search);
 app.get('/api/playlist/:username', api.getPlaylist);
