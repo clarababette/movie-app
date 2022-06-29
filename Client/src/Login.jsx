@@ -26,7 +26,7 @@ export default function Login({ signup, user }) {
       }
     }
      if (!Object.values(details).includes('')) {
-       axios.post('http://localhost:3023/api/login', { ...details }).then((res) => { console.log(res); user(res.data)})
+       axios.post('http://localhost:3023/api/login', { ...details }).then((res) => {user(res.data)})
     }
   }
 
