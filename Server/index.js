@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const Services = require('./services');
 const cookieParser = require('cookie-parser')
-
+const path = require('path');
 const app = express();
 
 const pgp = PgPromise();
@@ -17,6 +17,8 @@ if (process.env.NODE_ENV == 'production') {
     rejectUnauthorized: false
   }
 }
+
+app.use(express.static(path.join(__dirname, 'Server/dist')));
 
 const db = pgp(config);
 const api = Services(db);
