@@ -28,7 +28,6 @@ function Services(db) {
           res.cookie('jwt', refreshToken, {
             httpOnly: true,
             maxAge: 24 * 60 * 60 * 1000,
-            domain: 
           });
           res.json({username, accessToken});
         })
