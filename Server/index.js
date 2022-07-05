@@ -4,8 +4,12 @@ const PgPromise = require('pg-promise');
 require('dotenv').config();
 const Services = require('./services');
 const cookieParser = require('cookie-parser')
+const path = require('path')
 
 const app = express();
+
+
+app.use(express.static(path.join(__dirname, 'Server/dist')));
 
 const pgp = PgPromise();
 const DATABASE_URL = process.env.DATABASE_URL;

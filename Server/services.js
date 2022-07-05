@@ -1,7 +1,6 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const axios = require('axios');
-require('dotenv').config();
 
 function Services(db) {
   const signup = async (req, res) => {
@@ -29,8 +28,7 @@ function Services(db) {
           res.cookie('jwt', refreshToken, {
             httpOnly: true,
             maxAge: 24 * 60 * 60 * 1000,
-            domain: process.env.ORIGIN_URL,
-            sameSite: 'lax'
+            domain: 
           });
           res.json({username, accessToken});
         })
