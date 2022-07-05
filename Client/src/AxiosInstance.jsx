@@ -6,10 +6,10 @@ function AxiosInstance() {
   const { user } = useContext(UserContext);
 
   const axiosInstance = axios.create({
-    baseURL: 'https://clarababette-movies.herokuapp.com/',
+    baseURL: import.meta.env.VITE_SERVER_URL,
     headers: {
       Authorization: user?.accessToken,
-      'Access-Control-Allow-Origin': 'https://clarababette-movies.herokuapp.com/',
+      'Access-Control-Allow-Origin': import.meta.env.VITE_SERVER_URL,
       'Content-Type': 'application/json'
     },
     withCredentials: true

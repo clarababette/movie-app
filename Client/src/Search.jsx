@@ -41,7 +41,7 @@ export default function Search() {
      setResultMsg('Trending films');
      setQueryResult(findFavourites(res.data))
      setChange(true);
-    })
+    }).catch(err => console.log(err))
   }
   trending()
 },[])

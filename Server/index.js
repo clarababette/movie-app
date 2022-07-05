@@ -1,7 +1,6 @@
 const express = require('express');
 const cors = require('cors');
 const PgPromise = require('pg-promise');
-const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const Services = require('./services');
 const cookieParser = require('cookie-parser')
