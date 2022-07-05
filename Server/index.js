@@ -23,7 +23,7 @@ const api = Services(db);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
+app.use(cors({ credentials: true, origin: process.env.ORIGIN_URL }));
 app.use(cookieParser())
 
 app.post('/api/signup', api.signup);
