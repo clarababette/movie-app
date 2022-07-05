@@ -30,6 +30,7 @@ function Services(db) {
             httpOnly: true,
             maxAge: 24 * 60 * 60 * 1000,
             domain: process.env.ORIGIN_URL,
+            sameSite: 'lax'
           });
           res.json({username, accessToken});
         })
