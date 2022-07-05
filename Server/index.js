@@ -29,10 +29,12 @@ app.use(cookieParser())
 app.post('/api/signup', api.signup);
 app.post('/api/refresh', api.handleRefreshToken);
 app.post('/api/login', api.login);
+app.use(api.verifyJWT)
 app.get('/api/search', api.search);
 app.get('/api/playlist/:username', api.getPlaylist);
 app.post('/api/playlist/:username/add', api.addToPlaylist);
 app.post('/api/playlist/:username/remove', api.removeFromPlaylist);
+app.get('/api/trending', api.getTrending);
 
 const PORT = process.env.PORT || 3023;
 

@@ -1,9 +1,11 @@
-import axios from 'axios';
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { Card, Typography, Button, TextField } from '@mui/material';
-import React from 'react';
+import AxiosInstance from './AxiosInstance';
+import UserContext from './UserContext';
 
-export default function SignUp({ user, signup}) {
+export default function SignUp() {
+  const axios = AxiosInstance();
+  const { setUser: user, setSignup: signup } = useContext(UserContext);
   const [details, setDetails] = useState({
     firstName:'',
     lastName:'',
@@ -37,7 +39,7 @@ export default function SignUp({ user, signup}) {
       if (details.password !== details.confirmPassword) {
       setErrors({...errors, password: 'Passwords must match', confirmPassword: 'Passwords must match'})
     } else if (!Object.values(details).includes('')) {
-        axios.post('http://localhost:3023/api/signup', { ...details }).then((res) => { user(res.data);  signup(false)})
+         await axios.post('/api/signup', { ...details }).then((res) => { user(res.data);  signup(false)})
     }
   }
 

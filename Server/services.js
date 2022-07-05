@@ -92,14 +92,13 @@ function Services(db) {
 
   const handleRefreshToken = (req, res) => {
     const cookies = req.cookies;
-    console.log(req);
-    if (!cookies?.jwt) return res.sendStatus(401);
+    if (!cookies?.jwt) return res.sendStatus(499);
     const refreshToken = cookies.jwt;
     jwt.verify(
       refreshToken,
       process.env.REFRESH_TOKEN_SECRET,
       (err, decoded) => {
-        if (err) return res.sendStatus(403);
+        if (err) return res.sendStatus(498);
         const username = decoded.username;
         const accessToken = jwt.sign(
           {username},
@@ -112,7 +111,10 @@ function Services(db) {
   };
 
   const search = async (req, res) => {
-    const {queryString} = req.body;
+    const { queryString } = req.query;
+    let movies;
+    if (!queryString) { res.sendStatus(418) }
+    else {
     const key = process.env.MOVIE_API_KEY;
     const config = await axios.get(
       `https://api.themoviedb.org/3/configuration?api_key=${key}`,
@@ -123,7 +125,7 @@ function Services(db) {
         `https://api.themoviedb.org/3/search/movie?api_key=${key}&query=${queryString}&include_adult=false`,
       )
       .then((result) => {
-        let movies = result.data.results.map((movie) => {
+        movies = result.data.results.map((movie) => {
           const date = new Date(movie.release_date)
           return {
             popularity: movie.popularity,
@@ -135,6 +137,7 @@ function Services(db) {
         movies = sortByPropFloat(movies, 'popularity');
         res.json(movies);
       });
+    }
   };
   const getPlaylist = async (req, res) => {
     const {username} = req.params;
@@ -144,23 +147,24 @@ function Services(db) {
         [username],
       )
       .then((result) => {
-        res.json(result);
+        const movies = result.map((movie) => { return { title: movie.movie_name, poster: movie.poster_url, year: movie.year } });
+        res.json(movies);
       })
       .catch((err) => res.send(err));
   };
   const addToPlaylist = async (req, res) => {
-    const {username} = req.params;
-    const {title, poster} = req.body;
+    const { username } = req.params;
+    const {title, poster, year} = req.body;
     await db
       .none(
-        'insert into movies(movie_name, poster_url, user_id) select $1, $2, users.id from users where users.username = $3',
-        [title, poster, username],
+        'insert into movies(movie_name, poster_url, year, user_id) values( $1, $2, $3, (select users.id from users where users.username = $4)) on conflict do nothing',
+        [title, poster, year, username],
       )
-      .then(res.send('added'))
+      .then(res => res.send('added'))
       .catch((err) => res.send(err));
   };
   const removeFromPlaylist = async (req, res) => {
-    const {username} = req.params;
+    const { username } = req.params;
     const {title, poster} = req.body;
     await db
       .none(
@@ -170,6 +174,33 @@ function Services(db) {
       .then(res.send('removed'))
       .catch((err) => res.send(err));
   };
+
+  const getTrending = async (req, res) => {
+    let movies;
+    const key = process.env.MOVIE_API_KEY;
+    const config = await axios.get(
+      `https://api.themoviedb.org/3/configuration?api_key=${key}`,
+    );
+    const posterBase = config.data.images.base_url;
+    await axios
+      .get(
+        `https://api.themoviedb.org/3/trending/movie/day?api_key=${key}`,
+      )
+      .then((result) => {
+        movies = result.data.results.map((movie) => {
+          const date = new Date(movie.release_date)
+          return {
+            popularity: movie.popularity,
+            poster: `${posterBase}w185${movie.poster_path}`,
+            title: movie.title,
+            year: date.getFullYear()
+          };
+        });
+        movies = sortByPropFloat(movies, 'popularity');
+        res.json(movies);
+      });
+  }
+
   return {
     signup,
     login,
@@ -178,6 +209,8 @@ function Services(db) {
     addToPlaylist,
     removeFromPlaylist,
     handleRefreshToken,
+    verifyJWT,
+    getTrending
   };
 }
 
