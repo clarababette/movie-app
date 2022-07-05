@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const Services = require('./services');
 const cookieParser = require('cookie-parser')
-const path = require('path');
+
 const app = express();
 
 const pgp = PgPromise();
@@ -18,14 +18,12 @@ if (process.env.NODE_ENV == 'production') {
   }
 }
 
-app.use(express.static(path.join(__dirname, 'Server/dist')));
-
 const db = pgp(config);
 const api = Services(db);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cors({ credentials: true, origin: "https://clarababette-movies.herokuapp.com/" }));
+app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
 app.use(cookieParser())
 
 app.post('/api/signup', api.signup);
