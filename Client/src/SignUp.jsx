@@ -5,7 +5,7 @@ import UserContext from './UserContext';
 
 export default function SignUp() {
   const axios = AxiosInstance();
-  const { setUser: user, setSignup: signup } = useContext(UserContext);
+  const { setUser: user, setSignup: signup, setLoggedin } = useContext(UserContext);
   const [details, setDetails] = useState({
     firstName:'',
     lastName:'',
@@ -39,7 +39,7 @@ export default function SignUp() {
       if (details.password !== details.confirmPassword) {
       setErrors({...errors, password: 'Passwords must match', confirmPassword: 'Passwords must match'})
     } else if (!Object.values(details).includes('')) {
-         await axios.post('/api/signup', { ...details }).then((res) => { if(res.data.username) {user(res.data); localStorage.setItem("user", JSON.stringify(res.data));  signup(false)}}).catch((err) => console.log(err))
+        await axios.post('/api/signup', { ...details }).then((res) => { console.log(res.data); if (res.data.username) { user(res.data); localStorage.setItem("user", JSON.stringify(res.data)); setLoggedin(true); signup(false)}}).catch((err) => console.log(err))
     }
   }
 

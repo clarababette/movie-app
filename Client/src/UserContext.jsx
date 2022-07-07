@@ -5,32 +5,35 @@ const UserContext = createContext({});
 
 export const UserProvider = ({ children }) => {
   const axios = AxiosInstance();
-  const [user, setUser] = useState();
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")) || undefined);
   const [signup, setSignup] = useState(false);
   const [favourites, setFavourites] = useState();
+  const [loggedin, setLoggedin] = useState(false); 
 
 
   useEffect(() => { 
     const getPlaylist = async () => {
+      console.log(user)
       await axios.get(`/api/playlist/${user.username}`).then(res => {
+        if(Array.isArray(res.data)){
         const movies = res.data.map(movie => { return {...movie, favourite: true}})
-        setFavourites(movies);
+        setFavourites(movies);}
+        setLoggedin(true);
       }).catch(err => { console.log(err.message) })
-    }
-    if (localStorage.getItem("user")) {
-      console.log(localStorage.getItem("user"))
-      setUser(JSON.parse(localStorage.getItem("user")));
     }
     if (user) {
       getPlaylist();
+    } else if (!user) {
+      setLoggedin(false)
     }
-  },[])
+
+  },[user])
   
   
   return (
     <UserContext.Provider
       value={{
-        user, setUser, signup, setSignup, favourites, setFavourites
+        user, setUser, signup, setSignup, favourites, setFavourites, loggedin, setLoggedin
       }}
     >
       {children}

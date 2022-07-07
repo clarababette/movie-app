@@ -27,7 +27,7 @@ function Services(db) {
             process.env.REFRESH_TOKEN_SECRET,
             {expiresIn: '1d'},
           );
-          res.json({username, accessToken, refreshToken});
+          res.json({ username, accessToken, refreshToken });
         })
         .catch((err) => {
           res.send(err);

@@ -9,7 +9,7 @@ export default function AddBtn({ film }) {
 
   const handleAdd = async () => {
     await axios.post(`/api/playlist/${user.username}/add`, film).then(() => {
-     setFavourites([...favourites, {...film, favourite: true}])
+     setFavourites([...favourites || [], {...film, favourite: true}])
    }).catch(err => console.log(err))
   }
 
