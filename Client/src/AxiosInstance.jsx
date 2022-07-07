@@ -8,7 +8,7 @@ function AxiosInstance() {
   const axiosInstance = axios.create({
     baseURL: import.meta.env.VITE_SERVER_URL,
     headers: {
-      Authorization: user?.accessToken,
+      Authorization: `Bearer ${user?.accessToken}`,
       'Access-Control-Allow-Origin': import.meta.env.VITE_SERVER_URL,
       'Content-Type': 'application/json'
     },
