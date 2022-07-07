@@ -38,7 +38,9 @@ export default function Search() {
   },[change])
 
   useEffect(() => {
-   const trending = async() => { await axios.get('/api/trending').then(res => {
+    const trending = async () => {
+      await axios.get('/api/trending').then(res => {
+     console.log(res.data)
      setResultMsg('Trending films');
      setQueryResult([...findFavourites(res.data)])
      setChange(true);
