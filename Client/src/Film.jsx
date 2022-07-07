@@ -5,7 +5,9 @@ import AddBtn from './AddBtn';
 
 export default function Film({ film }) {
   const { poster, title, year, favourite = 'unset' } = film;
-
+  if (film.favourite !== 'unset') {
+    console.log(film.title + '-' + film.favourite);
+  }
   return (
     <Card sx={{ display: 'grid', margin: '1rem', padding: '1rem', rowGap:'0.25rem', minWidth: '8rem', justifyItems: 'center', overflow: 'visible', height: 'auto', position: 'relative', backgroundColor:'#76B1CA' }}>
       {favourite != 'unset' && <StarBtn film={film}></StarBtn>}

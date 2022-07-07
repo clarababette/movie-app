@@ -18,20 +18,21 @@ export default function Search() {
       favourites?.forEach(fav => {
         if (movie.poster == fav.poster && movie.title == fav.title) {
           movies[index] = {...fav}
-      }
+        } 
      });
     });
    return movies
   }
   useEffect(() => {
     if (favourites && queryResult) {
-      setQueryResult(findFavourites(queryResult))
+      setQueryResult([...findFavourites(queryResult)])
+      console.log('fave changed')
     }
   }, [favourites])
   
   useEffect(() => {
     if (change && favourites && queryResult) {
-      setQueryResult(findFavourites(queryResult))
+      setQueryResult([...findFavourites(queryResult)])
       setChange(false);
     }
   },[change])
@@ -39,7 +40,7 @@ export default function Search() {
   useEffect(() => {
    const trending = async() => { await axios.get('/api/trending').then(res => {
      setResultMsg('Trending films');
-     setQueryResult(findFavourites(res.data))
+     setQueryResult([...findFavourites(res.data)])
      setChange(true);
     }).catch(err => console.log(err))
   }
@@ -69,7 +70,7 @@ export default function Search() {
       </div>
       <Typography>{resultMsg}</Typography>
       <div style={{display:'flex', overflow:'scroll', width:'100%'}}>
-      {queryResult && queryResult.map((film,index) => <Film key={index} film={film}></Film>)}
+      {queryResult && queryResult.map((film,index) => <Film key={film.favourite + index.toString()} film={film}></Film>)}
       </div>
     </Card>
   )

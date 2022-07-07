@@ -10,26 +10,21 @@ export const UserProvider = ({ children }) => {
   const [favourites, setFavourites] = useState();
 
 
-  useEffect(() => {
-    const getUser = async () => {
-      await axios.post('/api/refresh').then(res => {
-        setUser(res.data);
-      }).catch(err => {console.log(err.message)})
-    }
-
+  useEffect(() => { 
     const getPlaylist = async () => {
       await axios.get(`/api/playlist/${user.username}`).then(res => {
         const movies = res.data.map(movie => { return {...movie, favourite: true}})
         setFavourites(movies);
-      }).catch(err => {console.log(err.message)})
+      }).catch(err => { console.log(err.message) })
     }
-
-    if (!user) {
-      getUser()
-    } else {
-      getPlaylist()
+    if (localStorage.getItem("user")) {
+      console.log(localStorage.getItem("user"))
+      setUser(JSON.parse(localStorage.getItem("user")));
     }
-  },[user])
+    if (user) {
+      getPlaylist();
+    }
+  },[])
   
   
   return (

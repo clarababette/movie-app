@@ -39,7 +39,7 @@ export default function SignUp() {
       if (details.password !== details.confirmPassword) {
       setErrors({...errors, password: 'Passwords must match', confirmPassword: 'Passwords must match'})
     } else if (!Object.values(details).includes('')) {
-         await axios.post('/api/signup', { ...details }).then((res) => { user(res.data);  signup(false)})
+         await axios.post('/api/signup', { ...details }).then((res) => { if(res.data.username) {user(res.data); localStorage.setItem("user", JSON.stringify(res.data));  signup(false)}}).catch((err) => console.log(err))
     }
   }
 

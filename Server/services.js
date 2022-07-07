@@ -4,8 +4,9 @@ const axios = require('axios');
 
 function Services(db) {
   const signup = async (req, res) => {
-    const {firstName, lastName, username, password} = req.body;
-
+    const { firstName, lastName, username, password } = req.body;
+    console.log(req.body)
+    console.log(await db.any('select * from users'))
     const saltRounds = 10;
     bcrypt.hash(password, saltRounds, async (err, hash) => {
       await db
@@ -14,22 +15,19 @@ function Services(db) {
           [firstName, lastName, username, hash],
         )
         .then((result) => {
+          console.log(result)
           const {username} = result;
           const accessToken = jwt.sign(
             {username},
             process.env.ACCESS_TOKEN_SECRET,
             {expiresIn: '30s'},
-          );
+          ).catch(err => res.send(err));
           const refreshToken = jwt.sign(
             {username},
             process.env.REFRESH_TOKEN_SECRET,
             {expiresIn: '1d'},
           );
-          res.cookie('jwt', refreshToken, {
-            httpOnly: true,
-            maxAge: 24 * 60 * 60 * 1000,
-          });
-          res.json({username, accessToken});
+          res.json({username, accessToken, refreshToken});
         })
         .catch((err) => {
           res.send(err);
@@ -56,11 +54,7 @@ function Services(db) {
               process.env.REFRESH_TOKEN_SECRET,
               {expiresIn: '1d'},
             );
-            res.cookie('jwt', refreshToken, {
-              httpOnly: true,
-              maxAge: 24 * 60 * 60 * 1000,
-            });
-            res.json({username, accessToken});
+            res.json({username, accessToken, refreshToken});
           } else {
             res.status(401).send('invalid password');
           }
@@ -91,9 +85,8 @@ function Services(db) {
   };
 
   const handleRefreshToken = (req, res) => {
-    const cookies = req.cookies;
-    if (!cookies?.jwt) return res.sendStatus(499);
-    const refreshToken = cookies.jwt;
+    const { refreshToken } = req.body;
+    if (!refreshToken) return res.sendStatus(499);
     jwt.verify(
       refreshToken,
       process.env.REFRESH_TOKEN_SECRET,
@@ -131,7 +124,8 @@ function Services(db) {
             popularity: movie.popularity,
             poster: `${posterBase}w185${movie.poster_path}`,
             title: movie.title,
-            year: date.getFullYear()
+            year: date.getFullYear(),
+            favourite:'unset'
           };
         });
         movies = sortByPropFloat(movies, 'popularity');
@@ -194,7 +188,8 @@ function Services(db) {
             popularity: movie.popularity,
             poster: `${posterBase}w185${movie.poster_path}`,
             title: movie.title,
-            year: date.getFullYear()
+            year: date.getFullYear(),
+            favourite:'unset'
           };
         });
         movies = sortByPropFloat(movies, 'popularity');

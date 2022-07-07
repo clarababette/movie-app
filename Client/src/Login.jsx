@@ -29,7 +29,9 @@ export default function Login() {
       }
     }
      if (!Object.values(details).includes('')) {
-      await axios.post('/api/login', { ...details }).then((res) => {user(res.data)})
+       await axios.post('/api/login', { ...details })
+         .then((res) => { if(res.data.username) {user(res.data); localStorage.setItem("user", JSON.stringify(res.data))}; })
+         .catch((err) => console.log(err))
     }
   }
 
