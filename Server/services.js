@@ -15,19 +15,20 @@ function Services(db) {
           [firstName, lastName, username, hash],
         )
         .then((result) => {
+
           console.log(result)
-          const {username} = result;
+          const { username } = result;
           const accessToken = jwt.sign(
-            {username},
-            process.env.ACCESS_TOKEN_SECRET,
-            {expiresIn: '30s'},
-          ).catch(err => res.send(err));
-          const refreshToken = jwt.sign(
-            {username},
-            process.env.REFRESH_TOKEN_SECRET,
-            {expiresIn: '1d'},
-          );
-          res.json({ username, accessToken, refreshToken });
+              {username},
+              process.env.ACCESS_TOKEN_SECRET,
+              {expiresIn: '30s'},
+            );
+            const refreshToken = jwt.sign(
+              {username},
+              process.env.REFRESH_TOKEN_SECRET,
+              {expiresIn: '1d'},
+            );
+            res.json({username, accessToken, refreshToken});
         })
         .catch((err) => {
           res.send(err);
