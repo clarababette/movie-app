@@ -13,7 +13,6 @@ export const UserProvider = ({ children }) => {
 
   useEffect(() => { 
     const getPlaylist = async () => {
-      console.log(user)
       await axios.get(`/api/playlist/${user.username}`).then(res => {
         if(Array.isArray(res.data)){
         const movies = res.data.map(movie => { return {...movie, favourite: true}})
@@ -21,6 +20,7 @@ export const UserProvider = ({ children }) => {
         setLoggedin(true);
       }).catch(err => { console.log(err.message) })
     }
+    console.log(user)
     if (user) {
       getPlaylist();
     } else if (!user) {
